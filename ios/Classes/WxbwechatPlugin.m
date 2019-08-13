@@ -54,7 +54,6 @@
 - (UIImage *)zipImageWithUrl:(id)imageUrl
 {
     NSData * imageData = [[NSData alloc]initWithContentsOfURL:[NSURL URLWithString:imageUrl]];
-    imageData = UIImagePNGRepresentation(imageUrl);
     CGFloat maxFileSize = 32*1024;
     CGFloat compression = 0.9f;
     CGFloat maxCompression = 0.1f;
