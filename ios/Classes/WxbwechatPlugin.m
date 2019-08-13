@@ -33,7 +33,7 @@
     wxMiniObject.webpageUrl = @"https://api-test-c.wabgxiaobao.co/visiting-card/error";
     wxMiniObject.userName = @"gh_d2b176e76ef5";
     wxMiniObject.path = path;
-    wxMiniObject.hdImageData = [self getDataWithImageUrl:imgUrl];
+    wxMiniObject.hdImageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];
     wxMiniObject.miniProgramType = WXMiniProgramTypePreview;
     wxMiniObject.withShareTicket = YES;
     
@@ -48,11 +48,6 @@
     req.bText = NO;
     req.scene = WXSceneSession;
     [WXApi sendReq:req];
-}
-
-- (NSData*)getDataWithImageUrl:(NSString *)imgUrl{
-    NSData *data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:imgUrl]] returningResponse:NULL error:NULL];
-    return data;
 }
 
 @end
