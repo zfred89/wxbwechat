@@ -33,8 +33,7 @@
     wxMiniObject.webpageUrl = @"https://api-test-c.wabgxiaobao.co/visiting-card/error";
     wxMiniObject.userName = @"gh_d2b176e76ef5";
     wxMiniObject.path = path;
-    UIImage *img = [self zipImageWithUrl:imgUrl];
-    wxMiniObject.hdImageData = UIImageJPEGRepresentation(img, 1);
+    wxMiniObject.hdImageData = [self imageWithImgUrl:imgUrl scaledToSize:CGSizeMake(200, 160)];
     wxMiniObject.miniProgramType = WXMiniProgramTypePreview;
     wxMiniObject.withShareTicket = YES;
     
@@ -51,20 +50,16 @@
     [WXApi sendReq:req];
 }
 
-- (UIImage *)zipImageWithUrl:(id)imageUrl
+
+- (NSData *)imageWithImgUrl:(NSString *)imgurl scaledToSize:(CGSize)newSize;
 {
-    NSData * imageData = [[NSData alloc]initWithContentsOfURL:[NSURL URLWithString:imageUrl]];
-    CGFloat maxFileSize = 32*1024;
-    CGFloat compression = 0.9f;
-    CGFloat maxCompression = 0.1f;
-    UIImage *image = [UIImage imageWithData:imageData];
-    NSData *compressedData = UIImageJPEGRepresentation(image, compression);
-    while ([compressedData length] > maxFileSize && compression > maxCompression) {
-        compression -= 0.1;
-        compressedData = UIImageJPEGRepresentation(image, compression);
-    }
-    UIImage *compressedImage = [UIImage imageWithData:imageData];
-    return compressedImage;
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgurl]];
+    UIImage *image = [UIImage imageWithData:data];
+    UIGraphicsBeginImageContext(newSize);
+    [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return UIImageJPEGRepresentation(newImage, 0.8);
 }
 
 
