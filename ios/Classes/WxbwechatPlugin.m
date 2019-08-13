@@ -16,7 +16,11 @@
       [WXApi registerApp:@"wx7df4c6aef7dd5845"];
       result(@"注册微信开发者");
   }else if ([@"send" isEqualToString:call.method]){
-      [self shareToWechatWithName:@"大魔王" visitingCardId:@"VC1e9ecdb33f6b404d8045a8a91bc0" imgUrl:@"http://adv.wangxiaobao.com/1564989164333.jpg"];
+      NSString *name = call.arguments[@"userName"];
+      NSString *cardId = call.arguments[@"cardId"];
+      NSString *imageUrl = call.arguments[@"headimgurl"];
+      
+      [self shareToWechatWithName:name visitingCardId:cardId imgUrl:imageUrl];
       result(@"已发送");
   } else {
     result(FlutterMethodNotImplemented);
