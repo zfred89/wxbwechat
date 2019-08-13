@@ -51,7 +51,7 @@
 }
 
 - (NSData*)getDataWithImageUrl:(NSString *)imgUrl{
-    NSData *data = NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:imgUrl]] returningResponse:NULL error:NULL];
+    NSData *data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:imgUrl]] returningResponse:NULL error:NULL];
     return data;
 }
 
