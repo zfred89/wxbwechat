@@ -34,7 +34,7 @@
     wxMiniObject.userName = @"gh_d2b176e76ef5";
     wxMiniObject.path = path;
     wxMiniObject.hdImageData = [self getDataWithImageUrl:imgUrl];
-    wxMiniObject.miniProgramType = WXMiniProgramTypeTest;
+    wxMiniObject.miniProgramType = WXMiniProgramTypePreview;
     wxMiniObject.withShareTicket = YES;
     
     WXMediaMessage *message = [[WXMediaMessage alloc]init];
