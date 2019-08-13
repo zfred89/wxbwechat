@@ -21,7 +21,6 @@
       NSString *imageUrl = call.arguments[@"headimgurl"];
       
       [self shareToWechatWithName:name visitingCardId:cardId imgUrl:imageUrl];
-      result(@"已发送");
   } else {
     result(FlutterMethodNotImplemented);
   }
