@@ -33,7 +33,9 @@
     wxMiniObject.webpageUrl = @"https://api-test-c.wabgxiaobao.co/visiting-card/error";
     wxMiniObject.userName = @"gh_d2b176e76ef5";
     wxMiniObject.path = path;
-    wxMiniObject.hdImageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];
+    UIImage *img = [UIImage imageWithData:data];
+    wxMiniObject.hdImageData = UIImageJPEGRepresentation(img, 0.6);
     wxMiniObject.miniProgramType = WXMiniProgramTypePreview;
     wxMiniObject.withShareTicket = YES;
     
