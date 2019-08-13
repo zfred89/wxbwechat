@@ -35,7 +35,7 @@
     wxMiniObject.path = path;
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];
     UIImage *img = [UIImage imageWithData:data];
-    wxMiniObject.hdImageData = [self resetSizeOfImageData:img maxSize:128];
+    wxMiniObject.hdImageData = [self resetSizeOfImageData:img maxSize:90];
     wxMiniObject.miniProgramType = WXMiniProgramTypePreview;
     wxMiniObject.withShareTicket = YES;
     
