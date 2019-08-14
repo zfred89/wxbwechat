@@ -32,3 +32,6 @@ android {
         disable 'InvalidPackage'
     }
 }
+dependencies {
+    compile 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
+}
