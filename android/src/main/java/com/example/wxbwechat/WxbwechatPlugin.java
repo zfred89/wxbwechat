@@ -78,7 +78,7 @@ public class WxbwechatPlugin implements MethodCallHandler {
       req.scene = SendMessageToWX.Req.WXSceneSession;  // 目前只支持会话
 
       if (bitmap != null) {
-        Bitmap thumbBitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
+        Bitmap thumbBitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, true);
         message.thumbData = convertBitmapToByteArray(thumbBitmap, true);
 
       }
