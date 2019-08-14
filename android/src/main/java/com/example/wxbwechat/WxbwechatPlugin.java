@@ -55,8 +55,8 @@ public class WxbwechatPlugin implements MethodCallHandler {
     if (call.method.equals("getPlatformVersion")) {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
     } else if(call.method.equals("register")) {
-      api = WXAPIFactory.createWXAPI(context,"",true);
-
+      api = WXAPIFactory.createWXAPI(context,"wx7df4c6aef7dd5845",true);
+      result.success(api.registerApp("wx7df4c6aef7dd5845"));
     } else if (call.method.equals("send")) {
       String name = call.argument("userName");
       String cardId = call.argument("cardId");
