@@ -26,12 +26,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import android.os.Message;
+import android.os.Handler;
 
 /** WxbwechatPlugin */
 public class WxbwechatPlugin implements MethodCallHandler {
 
   private static IWXAPI api;
   private Context context;
+  private WXMediaMessage message;
+  private Bitmap bitmap;
 
   private WxbwechatPlugin(Context ctx) {
     context = ctx;
@@ -64,7 +68,27 @@ public class WxbwechatPlugin implements MethodCallHandler {
     }
   }
 
-  private void sendCard(String name,String cardId,String headImgurl) {
+  private Handler handler = new Handler(new Handler.Callback() {
+    @Override
+    public boolean handleMessage(Message osMessage) {
+
+      SendMessageToWX.Req req = new SendMessageToWX.Req();
+      req.transaction = "miniProgram" + System.currentTimeMillis();
+
+      req.scene = SendMessageToWX.Req.WXSceneSession;  // 目前只支持会话
+
+      if (bitmap != null) {
+        Bitmap thumbBitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
+        message.thumbData = convertBitmapToByteArray(thumbBitmap, true);
+
+      }
+      req.message = message;
+      api.sendReq(req);
+      return false;
+    }
+  });
+
+  private void sendCard(String name, String cardId, final String headImgurl) {
     WXMiniProgramObject miniProgramObj = new WXMiniProgramObject();
     miniProgramObj.userName = "gh_d2b176e76ef5";// 小程序原始id
     miniProgramObj.webpageUrl = "https://api-test-c.wabgxiaobao.co/visiting-card/error"; // 兼容低版本的网页链接
@@ -73,17 +97,19 @@ public class WxbwechatPlugin implements MethodCallHandler {
     String path = "pages/personal_card/card?visitingCardId=".concat(cardId);
     miniProgramObj.path = path; // 小程序页面路径
 
-    WXMediaMessage msg = new WXMediaMessage(miniProgramObj);
+    message = new WXMediaMessage(miniProgramObj);
     String title = "你好，我是"+name+",这是我的名片";
-    msg.title = title; // 小程序消息title
-    msg.description = title; // 小程序消息desc
-    msg.thumbData = getZoomBitmapBytes(GetBitmap(headImgurl),32); // 小程序消息封面图片，小于128k
+    message.title = title; // 小程序消息title
+    message.description = title; // 小程序消息desc
+    new Thread() {
+      public void run() {
+        Message osMessage = new Message();
+        bitmap = GetBitmap(headImgurl);
+        osMessage.what = 0;
+        handler.sendMessage(osMessage);
+      }
+    }.start();
 
-    SendMessageToWX.Req req = new SendMessageToWX.Req();
-    req.transaction = "miniProgram" + System.currentTimeMillis();
-    req.message = msg;
-    req.scene = SendMessageToWX.Req.WXSceneSession;  // 目前只支持会话
-//    CardApplication.getWxApi().sendReq(req);
   }
   public byte[] convertBitmapToByteArray(final Bitmap bitmap, final boolean needRecycle) {
     ByteArrayOutputStream output = new ByteArrayOutputStream();
