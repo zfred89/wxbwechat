@@ -6,7 +6,7 @@ PODS:
     - WechatOpenSDK
 
 DEPENDENCIES:
-  - Flutter (from `.symlinks/flutter/ios-release`)
+  - Flutter (from `.symlinks/flutter/ios`)
   - wxbwechat (from `.symlinks/plugins/wxbwechat/ios`)
 
 SPEC REPOS:
@@ -15,7 +15,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Flutter:
-    :path: ".symlinks/flutter/ios-release"
+    :path: ".symlinks/flutter/ios"
   wxbwechat:
     :path: ".symlinks/plugins/wxbwechat/ios"
 

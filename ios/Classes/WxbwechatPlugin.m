@@ -35,7 +35,7 @@
     wxMiniObject.path = path;
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];
     UIImage *img = [UIImage imageWithData:data];
-    wxMiniObject.hdImageData = [self resetSizeOfImageData:img maxSize:35];
+    wxMiniObject.hdImageData = [self reSizeImageData:img maxImageSize:200 maxFileSizeWithKB:32];
     wxMiniObject.miniProgramType = WXMiniProgramTypePreview;
     wxMiniObject.withShareTicket = YES;
     
@@ -53,108 +53,42 @@
 }
 
 
-- (NSData *)resetSizeOfImageData:(UIImage *)sourceImage maxSize:(NSInteger)maxSize {
+- (NSData *)reSizeImageData:(UIImage *)sourceImage maxImageSize:(CGFloat)maxImageSize maxFileSizeWithKB:(CGFloat)maxFileSize
+{
     
-    //先判断当前质量是否满足要求，不满足再进行压缩
-    __block NSData *finallImageData = UIImageJPEGRepresentation(sourceImage, 1.0);
-    NSUInteger sizeOrigin   = finallImageData.length;
-    NSUInteger sizeOriginKB = sizeOrigin / 1000;
+    if (maxFileSize <= 0.0)  maxFileSize = 1024.0;
+    if (maxImageSize <= 0.0) maxImageSize = 1024.0;
     
-    if (sizeOriginKB <= maxSize) {
-        return finallImageData;
-    }
-    
-    //获取原图片宽高比
-    CGFloat sourceImageAspectRatio = sourceImage.size.width / sourceImage.size.height;
     //先调整分辨率
-    CGSize defaultSize = CGSizeMake(1024, 1024 / sourceImageAspectRatio);
-    UIImage * newImage = [self newSizeImage:defaultSize image:sourceImage];
-    finallImageData    = UIImageJPEGRepresentation(newImage, 1.0);
+    CGSize newSize = CGSizeMake(sourceImage.size.width, sourceImage.size.height);
     
-    //保存压缩系数
-    NSMutableArray *compressionQualityArr = [NSMutableArray array];
-    CGFloat avg   = 1.0 / 250;
-    CGFloat value = avg;
-    for (int i = 250; i >= 1; i --) {
-        value = i * avg;
-        [compressionQualityArr addObject:@(value)];
-    }
-    
-    /*
-     调整大小
-     说明：压缩系数数组compressionQualityArr是从大到小存储。
-     */
-    //思路：使用二分法搜索
-    finallImageData = [self halfFuntion:compressionQualityArr image:newImage sourceData:finallImageData maxSize:maxSize];
-    //如果还是未能压缩到指定大小，则进行降分辨率
-    while (finallImageData.length == 0) {
-        //每次降100分辨率
-        CGFloat reduceWidth  = 100.0;
-        CGFloat reduceHeight = 100.0 / sourceImageAspectRatio;
-        if (defaultSize.width - reduceWidth <= 0 || defaultSize.height - reduceHeight <= 0) {
-            break;
-        }
-        defaultSize = CGSizeMake(defaultSize.width - reduceWidth, defaultSize.height - reduceHeight);
-        UIImage *image = [self newSizeImage:defaultSize
-                                      image:[UIImage imageWithData:UIImageJPEGRepresentation(newImage, [[compressionQualityArr lastObject] floatValue])]];
-        finallImageData = [self halfFuntion:compressionQualityArr image:image sourceData:UIImageJPEGRepresentation(image,1.0) maxSize:maxSize];
-    }
-    return finallImageData;
-}
-
-#pragma mark 调整图片分辨率/尺寸（等比例缩放）
-- (UIImage *)newSizeImage:(CGSize)size image:(UIImage *)sourceImage {
-    
-    CGSize newSize     = CGSizeMake(sourceImage.size.width, sourceImage.size.height);
-    CGFloat tempHeight = newSize.height / size.height;
-    CGFloat tempWidth  = newSize.width / size.width;
+    CGFloat tempHeight = newSize.height / maxImageSize;
+    CGFloat tempWidth = newSize.width / maxImageSize;
     
     if (tempWidth > 1.0 && tempWidth > tempHeight) {
         newSize = CGSizeMake(sourceImage.size.width / tempWidth, sourceImage.size.height / tempWidth);
-    } else if (tempHeight > 1.0 && tempWidth < tempHeight) {
+    }
+    else if (tempHeight > 1.0 && tempWidth < tempHeight){
         newSize = CGSizeMake(sourceImage.size.width / tempHeight, sourceImage.size.height / tempHeight);
     }
     
     UIGraphicsBeginImageContext(newSize);
-    [sourceImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    [sourceImage drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    return newImage;
-}
-
-#pragma mark 二分法
-- (NSData *)halfFuntion:(NSArray *)arr image:(UIImage *)image sourceData:(NSData *)finallImageData maxSize:(NSInteger)maxSize {
     
-    NSData *tempData = [NSData data];
-    NSUInteger start = 0;
-    NSUInteger end   = arr.count - 1;
-    NSUInteger index = 0;
-    NSUInteger difference = NSIntegerMax;
+    //调整大小
+    NSData *imageData = UIImageJPEGRepresentation(newImage,1.0);
+    CGFloat sizeOriginKB = imageData.length / 1024.0;
     
-    while(start <= end) {
-        index = start + (end - start) / 2;
-        finallImageData = UIImageJPEGRepresentation(image, [arr[index] floatValue]);
-        NSUInteger sizeOrigin   = finallImageData.length;
-        NSUInteger sizeOriginKB = sizeOrigin / 1024;
-        NSLog(@"当前降到的质量：%ld", (unsigned long)sizeOriginKB);
-        NSLog(@"\nstart：%zd\nend：%zd\nindex：%zd\n压缩系数：%lf", start, end, (unsigned long)index, [arr[index] floatValue]);
-        
-        if (sizeOriginKB > maxSize) {
-            start = index + 1;
-        } else if (sizeOriginKB < maxSize) {
-            if (maxSize - sizeOriginKB < difference) {
-                difference = maxSize - sizeOriginKB;
-                tempData   = finallImageData;
-            }
-            if (index <= 0) {
-                break;
-            }
-            end = index - 1;
-        } else {
-            break;
-        }
+    CGFloat resizeRate = 0.9;
+    while (sizeOriginKB > maxFileSize && resizeRate > 0.1) {
+        imageData = UIImageJPEGRepresentation(newImage,resizeRate);
+        sizeOriginKB = imageData.length / 1024.0;
+        resizeRate -= 0.1;
     }
-    return tempData;
+    
+    return imageData;
 }
 
 
