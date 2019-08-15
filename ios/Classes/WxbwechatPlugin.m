@@ -35,7 +35,7 @@
     wxMiniObject.path = path;
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];
     UIImage *img = [UIImage imageWithData:data];
-//    wxMiniObject.hdImageData = [self reSizeImageData:img maxImageSize:200 maxFileSizeWithKB:32];
+    wxMiniObject.hdImageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];;
     wxMiniObject.miniProgramType = WXMiniProgramTypePreview;
     wxMiniObject.withShareTicket = YES;
     
@@ -43,7 +43,7 @@
     message.title = title;
     message.description = title;
     message.mediaObject = wxMiniObject;
-    message.thumbData = [self reSizeImageData:img maxImageSize:200 maxFileSizeWithKB:30];;
+    message.thumbData = nil;
     
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc]init];
     req.message = message;
@@ -69,6 +69,7 @@
     
     //调整大小
     NSData *imageData = UIImageJPEGRepresentation(newImage,1.0);
+    
     CGFloat sizeOriginKB = imageData.length / 1024.0;
     
 //    CGFloat resizeRate = 0.9;
