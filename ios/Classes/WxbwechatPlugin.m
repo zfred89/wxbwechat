@@ -35,7 +35,7 @@
     wxMiniObject.path = path;
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];
     UIImage *img = [UIImage imageWithData:data];
-    wxMiniObject.hdImageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];;
+    wxMiniObject.hdImageData = [self reSizeImageData:img maxImageSize:200 maxFileSizeWithKB:100];
     wxMiniObject.miniProgramType = WXMiniProgramTypePreview;
     wxMiniObject.withShareTicket = YES;
     
@@ -60,7 +60,17 @@
     if (maxImageSize <= 0.0) maxImageSize = 1024.0;
     
     //先调整分辨率
-    CGSize newSize = CGSizeMake(200, 200);
+    CGSize newSize = CGSizeMake(sourceImage.size.width, sourceImage.size.height);
+    
+    CGFloat tempHeight = newSize.height / maxImageSize;
+    CGFloat tempWidth = newSize.width / maxImageSize;
+    
+    if (tempWidth > 1.0 && tempWidth > tempHeight) {
+        newSize = CGSizeMake(sourceImage.size.width / tempWidth, sourceImage.size.height / tempWidth);
+    }
+    else if (tempHeight > 1.0 && tempWidth < tempHeight){
+        newSize = CGSizeMake(sourceImage.size.width / tempHeight, sourceImage.size.height / tempHeight);
+    }
     
     UIGraphicsBeginImageContext(newSize);
     [sourceImage drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
@@ -69,15 +79,14 @@
     
     //调整大小
     NSData *imageData = UIImageJPEGRepresentation(newImage,1.0);
-    
     CGFloat sizeOriginKB = imageData.length / 1024.0;
     
-//    CGFloat resizeRate = 0.9;
-//    while (sizeOriginKB > maxFileSize && resizeRate > 0.1) {
-        imageData = UIImageJPEGRepresentation(newImage,0.6);
-//        sizeOriginKB = imageData.length / 1024.0;
-//        resizeRate -= 0.1;
-//    }
+    CGFloat resizeRate = 0.9;
+    while (sizeOriginKB > maxFileSize && resizeRate > 0.1) {
+        imageData = UIImageJPEGRepresentation(newImage,resizeRate);
+        sizeOriginKB = imageData.length / 1024.0;
+        resizeRate -= 0.1;
+    }
     
     return imageData;
 }
