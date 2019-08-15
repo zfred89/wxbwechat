@@ -43,7 +43,7 @@
     message.title = title;
     message.description = title;
     message.mediaObject = wxMiniObject;
-    message.thumbData = [self reSizeImageData:img maxImageSize:200 maxFileSizeWithKB:32];;
+    message.thumbData = [self reSizeImageData:img maxImageSize:200 maxFileSizeWithKB:30];;
     
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc]init];
     req.message = message;
@@ -60,17 +60,7 @@
     if (maxImageSize <= 0.0) maxImageSize = 1024.0;
     
     //先调整分辨率
-    CGSize newSize = CGSizeMake(sourceImage.size.width, sourceImage.size.height);
-    
-    CGFloat tempHeight = newSize.height / maxImageSize;
-    CGFloat tempWidth = newSize.width / maxImageSize;
-    
-    if (tempWidth > 1.0 && tempWidth > tempHeight) {
-        newSize = CGSizeMake(sourceImage.size.width / tempWidth, sourceImage.size.height / tempWidth);
-    }
-    else if (tempHeight > 1.0 && tempWidth < tempHeight){
-        newSize = CGSizeMake(sourceImage.size.width / tempHeight, sourceImage.size.height / tempHeight);
-    }
+    CGSize newSize = CGSizeMake(200, 200);
     
     UIGraphicsBeginImageContext(newSize);
     [sourceImage drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
