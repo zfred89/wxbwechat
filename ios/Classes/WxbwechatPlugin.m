@@ -71,12 +71,12 @@
     NSData *imageData = UIImageJPEGRepresentation(newImage,1.0);
     CGFloat sizeOriginKB = imageData.length / 1024.0;
     
-    CGFloat resizeRate = 0.9;
-    while (sizeOriginKB > maxFileSize && resizeRate > 0.1) {
-        imageData = UIImageJPEGRepresentation(newImage,resizeRate);
-        sizeOriginKB = imageData.length / 1024.0;
-        resizeRate -= 0.1;
-    }
+//    CGFloat resizeRate = 0.9;
+//    while (sizeOriginKB > maxFileSize && resizeRate > 0.1) {
+        imageData = UIImageJPEGRepresentation(newImage,0.6);
+//        sizeOriginKB = imageData.length / 1024.0;
+//        resizeRate -= 0.1;
+//    }
     
     return imageData;
 }
