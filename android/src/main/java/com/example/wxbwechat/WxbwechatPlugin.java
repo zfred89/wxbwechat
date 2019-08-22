@@ -122,7 +122,7 @@ public class WxbwechatPlugin implements MethodCallHandler {
       public void run() {
         Message osMessage = new Message();
         bitmap = GetBitmap(thumbUrl);
-        osMessage.what = 0;
+        osMessage.what = 1;
         handler.sendMessage(osMessage);
       }
     }.start();
