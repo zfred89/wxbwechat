@@ -20,4 +20,9 @@ class Wxbwechat {
     final String text = await _channel.invokeMethod("send",{"userName":userName,"cardId":cardId,"headimgurl":headimgurl});
     return text;
   }
+
+  static Future sendWebToWechat({String title,String desc,String thumbUrl,String url,String type}) async {
+    final String text = await _channel.invokeMethod("shareweb",{"title":title,"desc":desc,"thumbUrl":thumbUrl,"url":url,"type":type});
+    return text;
+  }
 }

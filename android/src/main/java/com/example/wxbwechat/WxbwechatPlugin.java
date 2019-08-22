@@ -10,6 +10,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
+import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -17,6 +18,7 @@ import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.modelmsg.WXMiniProgramObject;
+
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -36,6 +38,7 @@ public class WxbwechatPlugin implements MethodCallHandler {
   private Context context;
   private WXMediaMessage message;
   private Bitmap bitmap;
+  private String kind;
 
   private WxbwechatPlugin(Context ctx) {
     context = ctx;
@@ -63,7 +66,14 @@ public class WxbwechatPlugin implements MethodCallHandler {
       String headimgurl = call.argument("headimgurl");
 
       sendCard(name,cardId,headimgurl);
-    }else {
+    }else if (call.method.equals("shareweb")){
+      String title = call.argument("title");
+      String desc = call.argument("desc");
+      String thumbUrl = call.argument("thumbUrl");
+      String url = call.argument("url");
+      String type = call.argument("type");
+      shareWebToWx(title,desc,thumbUrl,url,type);
+    } else{
       result.notImplemented();
     }
   }
@@ -73,20 +83,53 @@ public class WxbwechatPlugin implements MethodCallHandler {
     public boolean handleMessage(Message osMessage) {
 
       SendMessageToWX.Req req = new SendMessageToWX.Req();
-      req.transaction = "miniProgram" + System.currentTimeMillis();
-
-      req.scene = SendMessageToWX.Req.WXSceneSession;  // 目前只支持会话
 
       if (bitmap != null) {
         Bitmap thumbBitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, true);
         message.thumbData = convertBitmapToByteArray(thumbBitmap, true);
 
       }
-      req.message = message;
-      api.sendReq(req);
+
+      if (osMessage.what==0) {
+        req.transaction = "miniProgram" + System.currentTimeMillis();
+
+        req.scene = SendMessageToWX.Req.WXSceneSession;  // 目前只支持会话
+        req.message = message;
+        api.sendReq(req);
+      }else{
+        req.transaction = String.valueOf(System.currentTimeMillis());
+        req.message =message;
+        req.scene = kind.equals("moment") ? SendMessageToWX.Req.WXSceneTimeline : SendMessageToWX.Req.WXSceneSession;;
+        api.sendReq(req);
+      }
+
+
       return false;
     }
   });
+
+  private void shareWebToWx(String title, String desc, final String thumbUrl, String url, String type) {
+    //初始化一个WXWebpageObject，填写url
+    kind = type;
+    WXWebpageObject webpage = new WXWebpageObject();
+    webpage.webpageUrl =url;
+
+    WXMediaMessage msg = new WXMediaMessage(webpage);
+    msg.title ="网页标题 ";
+    msg.description ="网页描述";
+
+    new Thread() {
+      public void run() {
+        Message osMessage = new Message();
+        bitmap = GetBitmap(thumbUrl);
+        osMessage.what = 0;
+        handler.sendMessage(osMessage);
+      }
+    }.start();
+
+//构造一个Req
+
+  }
 
   private void sendCard(String name, String cardId, final String headImgurl) {
     WXMiniProgramObject miniProgramObj = new WXMiniProgramObject();

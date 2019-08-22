@@ -21,9 +21,34 @@
       NSString *imageUrl = call.arguments[@"headimgurl"];
       
       [self shareToWechatWithName:name visitingCardId:cardId imgUrl:imageUrl];
+  }else if ([@"shareweb" isEqualToString:call.method]){
+      NSString *title = call.arguments[@"title"];
+      NSString *desc = call.arguments[@"desc"];
+      NSString *url = call.arguments[@"url"];
+      NSString *thumbUrl = call.arguments[@"thumbUrl"];
+      NSString *type = call.arguments[@"type"];
+      [self shareWebToWxWithTitle:title desc:desc thumbImage:thumbUrl url:url type:type];
   } else {
     result(FlutterMethodNotImplemented);
   }
+}
+
+-(void)shareWebToWxWithTitle:(NSString *)title desc:(NSString *)desc thumbImage:(NSString *)thumbImg url:(NSString *)url type:(NSString *)type{
+    WXWebpageObject *webpageObject = [WXWebpageObject object];
+    webpageObject.webpageUrl = url;
+    
+    WXMediaMessage *message = [WXMediaMessage message];
+    message.title = title;
+    message.description = desc;
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:thumbImg]];
+    [message setThumbImage:[UIImage imageWithData:data]];
+    message.mediaObject = webpageObject;
+    
+    SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+    req.bText = NO;
+    req.message = message;
+    req.scene = [type isEqualToString:@"moment"] ? WXSceneTimeline : WXSceneSession;
+    [WXApi sendReq:req];
 }
 
 - (void)shareToWechatWithName:(NSString *)name visitingCardId:(NSString *)cardId imgUrl:(NSString *)imgUrl {
