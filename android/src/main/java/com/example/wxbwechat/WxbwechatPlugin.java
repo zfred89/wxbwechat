@@ -114,9 +114,9 @@ public class WxbwechatPlugin implements MethodCallHandler {
     WXWebpageObject webpage = new WXWebpageObject();
     webpage.webpageUrl =url;
 
-    WXMediaMessage msg = new WXMediaMessage(webpage);
-    msg.title =title;
-    msg.description =desc;
+    message = new WXMediaMessage(webpage);
+    message.title =title;
+    message.description =desc;
 
     new Thread() {
       public void run() {
