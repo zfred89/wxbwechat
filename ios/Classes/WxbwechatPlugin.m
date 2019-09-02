@@ -19,8 +19,9 @@
       NSString *name = call.arguments[@"userName"];
       NSString *cardId = call.arguments[@"cardId"];
       NSString *imageUrl = call.arguments[@"headimgurl"];
+      NSString *type = call.arguments[@"type"];
       
-      [self shareToWechatWithName:name visitingCardId:cardId imgUrl:imageUrl];
+      [self shareToWechatWithName:name visitingCardId:cardId imgUrl:imageUrl type:type];
   }else if ([@"shareweb" isEqualToString:call.method]){
       NSString *title = call.arguments[@"title"];
       NSString *desc = call.arguments[@"desc"];
@@ -51,7 +52,7 @@
     [WXApi sendReq:req];
 }
 
-- (void)shareToWechatWithName:(NSString *)name visitingCardId:(NSString *)cardId imgUrl:(NSString *)imgUrl {
+- (void)shareToWechatWithName:(NSString *)name visitingCardId:(NSString *)cardId imgUrl:(NSString *)imgUrl type:(NSString *)type {
     NSString *title = [NSString stringWithFormat:@"你好，我是%@，这是我的名片",name];
     NSString *path = [NSString stringWithFormat:@"pages/personal_card/card?visitingCardId=%@",cardId];
     WXMiniProgramObject *wxMiniObject = [[WXMiniProgramObject alloc]init];
@@ -61,7 +62,7 @@
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];
     UIImage *img = [UIImage imageWithData:data];
     wxMiniObject.hdImageData = [self reSizeImageData:img maxImageSize:500 maxFileSizeWithKB:100];
-    wxMiniObject.miniProgramType = WXMiniProgramTypePreview;
+    wxMiniObject.miniProgramType = [type isEqualToString:@"release"] ? WXMiniProgramTypeRelease : WXMiniProgramTypePreview;
     wxMiniObject.withShareTicket = YES;
     
     WXMediaMessage *message = [[WXMediaMessage alloc]init];
