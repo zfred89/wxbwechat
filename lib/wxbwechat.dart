@@ -16,8 +16,8 @@ class Wxbwechat {
     return text;
   }
 
-  static Future sendToWechat({String userName,String cardId,String headimgurl}) async {
-    final String text = await _channel.invokeMethod("send",{"userName":userName,"cardId":cardId,"headimgurl":headimgurl});
+  static Future sendToWechat({String userName,String cardId,String headimgurl,String type}) async {
+    final String text = await _channel.invokeMethod("send",{"userName":userName,"cardId":cardId,"headimgurl":headimgurl,"type":type});
     return text;
   }
 

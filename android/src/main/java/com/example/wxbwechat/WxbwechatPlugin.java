@@ -64,8 +64,9 @@ public class WxbwechatPlugin implements MethodCallHandler {
       String name = call.argument("userName");
       String cardId = call.argument("cardId");
       String headimgurl = call.argument("headimgurl");
+      String type = call.argument("type");
 
-      sendCard(name,cardId,headimgurl);
+      sendCard(name,cardId,headimgurl,type);
     }else if (call.method.equals("shareweb")){
       String title = call.argument("title");
       String desc = call.argument("desc");
@@ -131,11 +132,11 @@ public class WxbwechatPlugin implements MethodCallHandler {
 
   }
 
-  private void sendCard(String name, String cardId, final String headImgurl) {
+  private void sendCard(String name, String cardId, final String headImgurl, String type) {
     WXMiniProgramObject miniProgramObj = new WXMiniProgramObject();
     miniProgramObj.userName = "gh_d2b176e76ef5";// 小程序原始id
     miniProgramObj.webpageUrl = "https://api-test-c.wabgxiaobao.co/visiting-card/error"; // 兼容低版本的网页链接
-    miniProgramObj.miniprogramType = WXMiniProgramObject.MINIPROGRAM_TYPE_PREVIEW; // 正式版:0，测试版:1，体验版:2
+    miniProgramObj.miniprogramType = type.equals("release") ? WXMiniProgramObject.MINIPTOGRAM_TYPE_RELEASE : WXMiniProgramObject.MINIPROGRAM_TYPE_PREVIEW; // 正式版:0，测试版:1，体验版:2
 
     String path = "pages/personal_card/card?visitingCardId=".concat(cardId);
     miniProgramObj.path = path; // 小程序页面路径
