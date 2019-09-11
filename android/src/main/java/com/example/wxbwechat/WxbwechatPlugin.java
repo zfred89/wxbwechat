@@ -84,11 +84,11 @@ public class WxbwechatPlugin implements MethodCallHandler {
     public boolean handleMessage(Message osMessage) {
 
       SendMessageToWX.Req req = new SendMessageToWX.Req();
+      int maxSize = osMessage.what==0 ? 128 : 32;
 
       if (bitmap != null) {
         Bitmap thumbBitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, true);
-        message.thumbData = convertBitmapToByteArray(thumbBitmap, true);
-
+        message.thumbData = bitmap2Bytes(bitmap,maxSize);
       }
 
       if (osMessage.what==0) {
@@ -155,75 +155,23 @@ public class WxbwechatPlugin implements MethodCallHandler {
     }.start();
 
   }
-  public byte[] convertBitmapToByteArray(final Bitmap bitmap, final boolean needRecycle) {
+
+  /**
+   * Bitmap转换成byte[]并且进行压缩,压缩到不大于maxkb
+   * @param bitmap
+   * @param
+   * @return
+   */
+  public static byte[] bitmap2Bytes(Bitmap bitmap, int maxkb) {
     ByteArrayOutputStream output = new ByteArrayOutputStream();
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
-    if (needRecycle) {
-      bitmap.recycle();
+    int options = 100;
+    while (output.toByteArray().length > maxkb&& options != 10) {
+      output.reset(); //清空output
+      bitmap.compress(Bitmap.CompressFormat.JPEG, options, output);//这里压缩options%，把压缩后的数据存放到output中
+      options -= 10;
     }
-
-    byte[] result = output.toByteArray();
-    try {
-      output.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    return result;
-  }
-
-  public static byte[] getZoomBitmapBytes(Bitmap srcBitmap, int desSize) {
-    try {
-      if (srcBitmap == null) {
-        return null;
-      }
-
-      byte[] data;
-      long fileSize;
-      int quality = 90;
-      desSize = desSize * 1024;
-
-      int srcWidth = srcBitmap.getWidth();
-      int srcHeight = srcBitmap.getHeight();
-      if (srcWidth != srcHeight) {
-        int squareSize = Math.min(srcWidth, srcHeight);
-        int x = 0;
-        int y = 0;
-        if (srcWidth > squareSize) {
-          x = (srcWidth - squareSize) / 2;
-        }
-        if (srcHeight > squareSize) {
-          y = (srcWidth - squareSize) / 2;
-        }
-        srcBitmap = Bitmap.createBitmap(srcBitmap, x, y, squareSize, squareSize);
-      }
-
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      srcBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-      out.flush();
-      out.close();
-      fileSize = out.size();
-
-      if (fileSize <= desSize) {
-        data = out.toByteArray();
-        return data;
-      }
-
-      while (fileSize > desSize) {
-        out = new ByteArrayOutputStream();
-        srcBitmap.compress(Bitmap.CompressFormat.JPEG, quality, out);
-        out.flush();
-        out.close();
-        fileSize = out.size();
-        quality -= 10;
-      }
-
-      data = out.toByteArray();
-      return data;
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
+    return output.toByteArray();
   }
 
 
