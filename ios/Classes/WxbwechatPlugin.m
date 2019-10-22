@@ -13,7 +13,7 @@
   if ([@"getPlatformVersion" isEqualToString:call.method]) {
     result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
   } else if ([@"register" isEqualToString:call.method]){
-      [WXApi registerApp:@"wx7df4c6aef7dd5845"];
+      [WXApi registerApp:@"wx7df4c6aef7dd5845" universalLink:@""];
       result(@"注册微信开发者");
   }else if ([@"send" isEqualToString:call.method]){
       NSString *name = call.arguments[@"userName"];
@@ -49,7 +49,7 @@
     req.bText = NO;
     req.message = message;
     req.scene = [type isEqualToString:@"moment"] ? WXSceneTimeline : WXSceneSession;
-    [WXApi sendReq:req];
+    [WXApi sendReq:req completion:nil];
 }
 
 - (void)shareToWechatWithName:(NSString *)name visitingCardId:(NSString *)cardId imgUrl:(NSString *)imgUrl type:(NSString *)type {
@@ -75,7 +75,7 @@
     req.message = message;
     req.bText = NO;
     req.scene = WXSceneSession;
-    [WXApi sendReq:req];
+    [WXApi sendReq:req completion:nil];
 }
 
 
