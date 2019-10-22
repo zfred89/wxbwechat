@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - WechatOpenSDK (1.8.4)
+  - WechatOpenSDK (1.8.6)
   - wxbwechat (0.0.1):
     - Flutter
     - WechatOpenSDK
@@ -10,7 +10,7 @@ DEPENDENCIES:
   - wxbwechat (from `.symlinks/plugins/wxbwechat/ios`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - WechatOpenSDK
 
 EXTERNAL SOURCES:
@@ -20,10 +20,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/wxbwechat/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
-  WechatOpenSDK: 9b721089507c895d05f997408c30bb6e6f5f9b60
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  WechatOpenSDK: 368ae03b72ee3ea1328c4f11326fbb5d2721d118
   wxbwechat: 8f0a148954fe8fa38b0cb3c7fc55c3055ab216a3
 
 PODFILE CHECKSUM: e8988baac3a50f787b9d3ed7ca44957b442f92a7
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.8.4
