@@ -13,7 +13,7 @@
   if ([@"getPlatformVersion" isEqualToString:call.method]) {
     result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
   } else if ([@"register" isEqualToString:call.method]){
-      [WXApi registerApp:@"wx7df4c6aef7dd5845" universalLink:@""];
+      [WXApi registerApp:@"wx7df4c6aef7dd5845" universalLink:@"https://card.wangxiaobao.com/"];
       result(@"注册微信开发者");
   }else if ([@"send" isEqualToString:call.method]){
       NSString *name = call.arguments[@"userName"];
